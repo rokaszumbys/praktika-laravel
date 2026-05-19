@@ -6,6 +6,8 @@ use App\Models\Ticket;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TicketStatusChanged;
 
 class TicketController extends Controller
 {
@@ -111,6 +113,8 @@ class TicketController extends Controller
             'status' => $request->status,
         ]);
 
+        Mail::to($ticket->user->email)->send(new TicketStatusChanged($ticket));
+        
         return redirect()->route('tickets.show', $ticket)
             ->with('success', 'Bilieto būsena pakeista.');
     }
