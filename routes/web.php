@@ -39,6 +39,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/reports/active-tickets/send', [ReportController::class, 'sendActiveTicketsPdf'])
     ->name('reports.activeTicketsSend');
     
+    Route::get('/admin-test', function () {
+    return view('admin-test');
+    })->name('admin.test');
+
 });
 
 require __DIR__.'/auth.php';
