@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\TicketCommentController;
+use App\Http\Controllers\ReportController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -31,6 +32,13 @@ Route::middleware('auth')->group(function () {
         ->name('tickets.updateStatus');
 
     Route::resource('categories', CategoryController::class);
+
+    Route::get('/reports/active-tickets/pdf', [ReportController::class, 'activeTicketsPdf'])
+    ->name('reports.activeTicketsPdf');
+
+    Route::post('/reports/active-tickets/send', [ReportController::class, 'sendActiveTicketsPdf'])
+    ->name('reports.activeTicketsSend');
+    
 });
 
 require __DIR__.'/auth.php';

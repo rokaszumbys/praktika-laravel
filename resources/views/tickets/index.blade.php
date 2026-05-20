@@ -45,3 +45,19 @@
         </table>
     </div>
 </x-app-layout>
+
+@if(auth()->user()->isAdmin() || auth()->user()->isSupport())
+    <hr>
+
+    <h3>Aktyvių problemų ataskaita</h3>
+
+    <a href="{{ route('reports.activeTicketsPdf') }}">Atsisiųsti PDF</a>
+
+    <form method="POST" action="{{ route('reports.activeTicketsSend') }}" style="margin-top: 10px;">
+        @csrf
+
+        <input type="email" name="email" placeholder="Įveskite el. paštą">
+
+        <button type="submit">Siųsti PDF el. paštu</button>
+    </form>
+@endif
