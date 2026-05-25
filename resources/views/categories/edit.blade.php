@@ -1,19 +1,33 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2>Redaguoti kategoriją</h2>
-    </x-slot>
+@extends('adminlte::page')
 
-    <div style="padding: 20px;">
-        <form method="POST" action="{{ route('categories.update', $category) }}">
-            @csrf
-            @method('PUT')
+@section('title', 'Redaguoti kategoriją')
 
-            <label>Pavadinimas</label><br>
-            <input type="text" name="name" value="{{ $category->name }}">
+@section('content_header')
+    <h1>Redaguoti kategoriją</h1>
+@stop
 
-            <br><br>
+@section('content')
 
-            <button type="submit">Atnaujinti</button>
-        </form>
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" action="{{ route('categories.update', $category) }}">
+                @csrf
+                @method('PUT')
+
+                <div class="form-group">
+                    <label>Pavadinimas</label>
+                    <input type="text" name="name" class="form-control" value="{{ $category->name }}">
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Atnaujinti
+                </button>
+
+                <a href="{{ route('categories.index') }}" class="btn btn-secondary">
+                    Atgal
+                </a>
+            </form>
+        </div>
     </div>
-</x-app-layout>
+
+@stop
