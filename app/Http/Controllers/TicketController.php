@@ -13,11 +13,13 @@ class TicketController extends Controller
 {
     public function index()
     {
-        $tickets = Ticket::with(['user', 'category'])
-            ->latest()
-            ->get();
+    $tickets = Ticket::with(['user', 'category'])
+        ->latest()
+        ->get();
 
-        return view('tickets.index', compact('tickets'));
+    $pageTitle = 'Visi bilietai';
+
+    return view('tickets.index', compact('tickets', 'pageTitle'));
     }
 
     public function create()
@@ -117,5 +119,41 @@ class TicketController extends Controller
         
         return redirect()->route('tickets.show', $ticket)
             ->with('success', 'Bilieto būsena pakeista.');
+    }
+
+    public function newTickets()
+    {
+    $tickets = Ticket::with(['user', 'category'])
+        ->where('status', 'Naujas')
+        ->latest()
+        ->get();
+
+    $pageTitle = 'Nauji bilietai';
+
+    return view('tickets.index', compact('tickets', 'pageTitle'));
+    }
+
+    public function inProgressTickets()
+    {
+    $tickets = Ticket::with(['user', 'category'])
+        ->where('status', 'Vykdomas')
+        ->latest()
+        ->get();
+
+    $pageTitle = 'Vykdomi bilietai';
+
+    return view('tickets.index', compact('tickets', 'pageTitle'));
+    }
+
+    public function completedTickets()
+    {
+    $tickets = Ticket::with(['user', 'category'])
+        ->where('status', 'Užbaigtas')
+        ->latest()
+        ->get();
+
+    $pageTitle = 'Užbaigti bilietai';
+
+    return view('tickets.index', compact('tickets', 'pageTitle'));
     }
 }
