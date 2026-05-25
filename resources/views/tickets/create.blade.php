@@ -1,56 +1,60 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2>Naujas problemos bilietas</h2>
-    </x-slot>
+@extends('adminlte::page')
 
-    <div style="padding: 20px;">
-        <form method="POST" action="{{ route('tickets.store') }}">
-            @csrf
+@section('title', 'Naujas bilietas')
 
-            <div>
-                <label>Pavadinimas</label><br>
-                <input type="text" name="title" value="{{ old('title') }}">
+@section('content_header')
+    <h1>Naujas problemos bilietas</h1>
+@stop
 
-                @error('title')
-                    <p style="color: red;">{{ $message }}</p>
-                @enderror
-            </div>
+@section('content')
 
-            <br>
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" action="{{ route('tickets.store') }}">
+                @csrf
 
-            <div>
-                <label>Aprašymas</label><br>
-                <textarea name="description">{{ old('description') }}</textarea>
+                <div class="form-group">
+                    <label>Pavadinimas</label>
+                    <input type="text" name="title" class="form-control" value="{{ old('title') }}">
 
-                @error('description')
-                    <p style="color: red;">{{ $message }}</p>
-                @enderror
-            </div>
+                    @error('title')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
+                </div>
 
-            <br>
+                <div class="form-group">
+                    <label>Aprašymas</label>
+                    <textarea name="description" class="form-control" rows="5">{{ old('description') }}</textarea>
 
-            <div>
-                <label>Kategorija</label><br>
-                <select name="category_id">
-                    @foreach($categories as $category)
-                        <option value="{{ $category->id }}">
-                            {{ $category->name }}
-                        </option>
-                    @endforeach
-                </select>
+                    @error('description')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
+                </div>
 
-                @error('category_id')
-                    <p style="color: red;">{{ $message }}</p>
-                @enderror
-            </div>
+                <div class="form-group">
+                    <label>Kategorija</label>
+                    <select name="category_id" class="form-control">
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}">
+                                {{ $category->name }}
+                            </option>
+                        @endforeach
+                    </select>
 
-            <br>
+                    @error('category_id')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
+                </div>
 
-            <button type="submit">Išsaugoti</button>
-        </form>
+                <button type="submit" class="btn btn-primary">
+                    Išsaugoti
+                </button>
 
-        <br>
-
-        <a href="{{ route('tickets.index') }}">Grįžti į sąrašą</a>
+                <a href="{{ route('tickets.index') }}" class="btn btn-secondary">
+                    Atgal
+                </a>
+            </form>
+        </div>
     </div>
-</x-app-layout>
+
+@stop
