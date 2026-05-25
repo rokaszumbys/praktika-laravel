@@ -1,18 +1,32 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2>Nauja kategorija</h2>
-    </x-slot>
+@extends('adminlte::page')
 
-    <div style="padding: 20px;">
-        <form method="POST" action="{{ route('categories.store') }}">
-            @csrf
+@section('title', 'Nauja kategorija')
 
-            <label>Pavadinimas</label><br>
-            <input type="text" name="name">
+@section('content_header')
+    <h1>Nauja kategorija</h1>
+@stop
 
-            <br><br>
+@section('content')
 
-            <button type="submit">Išsaugoti</button>
-        </form>
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" action="{{ route('categories.store') }}">
+                @csrf
+
+                <div class="form-group">
+                    <label>Pavadinimas</label>
+                    <input type="text" name="name" class="form-control">
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Išsaugoti
+                </button>
+
+                <a href="{{ route('categories.index') }}" class="btn btn-secondary">
+                    Atgal
+                </a>
+            </form>
+        </div>
     </div>
-</x-app-layout>
+
+@stop
