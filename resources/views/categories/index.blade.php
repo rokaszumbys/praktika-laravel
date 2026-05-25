@@ -1,33 +1,56 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2>Kategorijos</h2>
-    </x-slot>
+@extends('adminlte::page')
 
-    <div style="padding: 20px;">
-        <a href="{{ route('categories.create') }}">Pridėti kategoriją</a>
+@section('title', 'Kategorijos')
 
-        <table border="1" cellpadding="10" style="margin-top: 20px;">
-            <tr>
-                <th>ID</th>
-                <th>Pavadinimas</th>
-                <th>Veiksmai</th>
-            </tr>
+@section('content_header')
+    <h1>Kategorijos</h1>
+@stop
 
-            @foreach($categories as $category)
+@section('content')
+
+    @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    <div class="card">
+        <div class="card-header">
+            <a href="{{ route('categories.create') }}" class="btn btn-primary">
+                Pridėti kategoriją
+            </a>
+        </div>
+
+        <div class="card-body">
+            <table class="table table-bordered table-striped">
                 <tr>
-                    <td>{{ $category->id }}</td>
-                    <td>{{ $category->name }}</td>
-                    <td>
-                        <a href="{{ route('categories.edit', $category) }}">Redaguoti</a>
-
-                        <form action="{{ route('categories.destroy', $category) }}" method="POST" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit">Trinti</button>
-                        </form>
-                    </td>
+                    <th>ID</th>
+                    <th>Pavadinimas</th>
+                    <th>Veiksmai</th>
                 </tr>
-            @endforeach
-        </table>
+
+                @foreach($categories as $category)
+                    <tr>
+                        <td>{{ $category->id }}</td>
+                        <td>{{ $category->name }}</td>
+                        <td>
+                            <a href="{{ route('categories.edit', $category) }}" class="btn btn-warning btn-sm">
+                                Redaguoti
+                            </a>
+
+                            <form action="{{ route('categories.destroy', $category) }}" method="POST" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    Trinti
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
+            </table>
+        </div>
     </div>
-</x-app-layout>
+
+@stop
