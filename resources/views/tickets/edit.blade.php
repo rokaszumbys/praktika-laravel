@@ -1,42 +1,49 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2>Redaguoti bilietą</h2>
-    </x-slot>
+@extends('adminlte::page')
 
-    <div style="padding: 20px;">
-        <form method="POST" action="{{ route('tickets.update', $ticket) }}">
-            @csrf
-            @method('PUT')
+@section('title', 'Redaguoti bilietą')
 
-            <div>
-                <label>Pavadinimas</label><br>
-                <input type="text" name="title" value="{{ old('title', $ticket->title) }}">
-            </div>
+@section('content_header')
+    <h1>Redaguoti bilietą</h1>
+@stop
 
-            <br>
+@section('content')
 
-            <div>
-                <label>Aprašymas</label><br>
-                <textarea name="description">{{ old('description', $ticket->description) }}</textarea>
-            </div>
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" action="{{ route('tickets.update', $ticket) }}">
+                @csrf
+                @method('PUT')
 
-            <br>
+                <div class="form-group">
+                    <label>Pavadinimas</label>
+                    <input type="text" name="title" class="form-control" value="{{ old('title', $ticket->title) }}">
+                </div>
 
-            <div>
-                <label>Kategorija</label><br>
-                <select name="category_id">
-                    @foreach($categories as $category)
-                        <option value="{{ $category->id }}"
-                            @if($ticket->category_id == $category->id) selected @endif>
-                            {{ $category->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+                <div class="form-group">
+                    <label>Aprašymas</label>
+                    <textarea name="description" class="form-control" rows="5">{{ old('description', $ticket->description) }}</textarea>
+                </div>
 
-            <br>
+                <div class="form-group">
+                    <label>Kategorija</label>
+                    <select name="category_id" class="form-control">
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}" @if($ticket->category_id == $category->id) selected @endif>
+                                {{ $category->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
-            <button type="submit">Atnaujinti</button>
-        </form>
+                <button type="submit" class="btn btn-primary">
+                    Atnaujinti
+                </button>
+
+                <a href="{{ route('tickets.index') }}" class="btn btn-secondary">
+                    Atgal
+                </a>
+            </form>
+        </div>
     </div>
-</x-app-layout>
+
+@stop
