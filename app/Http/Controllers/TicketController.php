@@ -13,13 +13,23 @@ class TicketController extends Controller
 {
     public function index()
     {
-         $tickets = Ticket::with(['user', 'category'])
+        $tickets = Ticket::with(['user', 'category'])
         ->latest()
         ->get();
 
-        $pageTitle = 'Visi bilietai';
+    $pageTitle = 'Visi bilietai';
 
-        return view('tickets.index', compact('tickets', 'pageTitle'));
+    $newCount = Ticket::where('status', 'Naujas')->count();
+    $inProgressCount = Ticket::where('status', 'Vykdomas')->count();
+    $completedCount = Ticket::where('status', 'Užbaigtas')->count();
+
+    return view('tickets.index', compact(
+        'tickets',
+        'pageTitle',
+        'newCount',
+        'inProgressCount',
+        'completedCount'
+    ));
     }
 
     public function create()
@@ -129,7 +139,17 @@ class TicketController extends Controller
 
     $pageTitle = 'Nauji bilietai';
 
-    return view('tickets.index', compact('tickets', 'pageTitle'));
+    $newCount = Ticket::where('status', 'Naujas')->count();
+    $inProgressCount = Ticket::where('status', 'Vykdomas')->count();
+    $completedCount = Ticket::where('status', 'Užbaigtas')->count();
+
+    return view('tickets.index', compact(
+        'tickets',
+        'pageTitle',
+        'newCount',
+        'inProgressCount',
+        'completedCount'
+    ));
     }
 
     public function inProgressTickets()

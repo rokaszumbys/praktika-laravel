@@ -8,12 +8,27 @@
 
 @section('content')
 
+    {{-- Pranešimas po veiksmų --}}
     @if(session('success'))
         <div class="alert alert-success">
             {{ session('success') }}
         </div>
     @endif
 
+    {{-- Pie chart kortelė --}}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Bilietų būsenų diagrama</h3>
+        </div>
+
+        <div class="card-body">
+            <div style="max-width: 400px; margin: auto;">
+                <canvas id="ticketsPieChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    {{-- Bilietų sąrašas --}}
     <div class="card">
         <div class="card-header">
             <a href="{{ route('tickets.create') }}" class="btn btn-primary">
@@ -22,62 +37,69 @@
         </div>
 
         <div class="card-body">
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Pavadinimas</th>
-                        <th>Kategorija</th>
-                        <th>Būsena</th>
-                        <th>Savininkas</th>
-                        <th>Veiksmai</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @foreach($tickets as $ticket)
+            @if($tickets->count() > 0)
+                <table class="table table-bordered table-striped">
+                    <thead>
                         <tr>
-                            <td>{{ $ticket->id }}</td>
-                            <td>{{ $ticket->title }}</td>
-                            <td>{{ $ticket->category->name }}</td>
-                            <td>
-                                @if($ticket->status == 'Naujas')
-                                    <span class="badge badge-primary">Naujas</span>
-                                @elseif($ticket->status == 'Vykdomas')
-                                    <span class="badge badge-warning">Vykdomas</span>
-                                @elseif($ticket->status == 'Užbaigtas')
-                                    <span class="badge badge-success">Užbaigtas</span>
-                                @else
-                                    <span class="badge badge-secondary">{{ $ticket->status }}</span>
-                                @endif
-                            </td>
-                            <td>{{ $ticket->user->name }}</td>
-                            <td>
-                                <a href="{{ route('tickets.show', $ticket) }}" class="btn btn-info btn-sm">
-                                    Peržiūrėti
-                                </a>
+                            <th>ID</th>
+                            <th>Pavadinimas</th>
+                            <th>Kategorija</th>
+                            <th>Būsena</th>
+                            <th>Savininkas</th>
+                            <th>Veiksmai</th>
+                        </tr>
+                    </thead>
 
-                                @if(auth()->id() === $ticket->user_id || auth()->user()->isAdmin())
-                                    <a href="{{ route('tickets.edit', $ticket) }}" class="btn btn-warning btn-sm">
-                                        Redaguoti
+                    <tbody>
+                        @foreach($tickets as $ticket)
+                            <tr>
+                                <td>{{ $ticket->id }}</td>
+                                <td>{{ $ticket->title }}</td>
+                                <td>{{ $ticket->category->name }}</td>
+                                <td>
+                                    @if($ticket->status == 'Naujas')
+                                        <span class="badge badge-primary">Naujas</span>
+                                    @elseif($ticket->status == 'Vykdomas')
+                                        <span class="badge badge-warning">Vykdomas</span>
+                                    @elseif($ticket->status == 'Užbaigtas')
+                                        <span class="badge badge-success">Užbaigtas</span>
+                                    @else
+                                        <span class="badge badge-secondary">{{ $ticket->status }}</span>
+                                    @endif
+                                </td>
+                                <td>{{ $ticket->user->name }}</td>
+                                <td>
+                                    <a href="{{ route('tickets.show', $ticket) }}" class="btn btn-info btn-sm">
+                                        Peržiūrėti
                                     </a>
 
-                                    <form action="{{ route('tickets.destroy', $ticket) }}" method="POST" style="display:inline;">
-                                        @csrf
-                                        @method('DELETE')
+                                    @if(auth()->id() === $ticket->user_id || auth()->user()->isAdmin())
+                                        <a href="{{ route('tickets.edit', $ticket) }}" class="btn btn-warning btn-sm">
+                                            Redaguoti
+                                        </a>
 
-                                        <button type="submit" class="btn btn-danger btn-sm">
-                                            Trinti
-                                        </button>
-                                    </form>
-                                @endif
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                                        <form action="{{ route('tickets.destroy', $ticket) }}" method="POST" style="display:inline;">
+                                            @csrf
+                                            @method('DELETE')
+
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                Trinti
+                                            </button>
+                                        </form>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @else
+                <div class="alert alert-info">
+                    Bilietų nėra.
+                </div>
+            @endif
         </div>
 
+        {{-- PDF ataskaita tik admin/support --}}
         @if(auth()->user()->isAdmin() || auth()->user()->isSupport())
             <div class="card-footer">
                 <a href="{{ route('reports.activeTicketsPdf') }}" class="btn btn-secondary">
@@ -97,4 +119,34 @@
         @endif
     </div>
 
+@stop
+
+@section('js')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        const ctx = document.getElementById('ticketsPieChart');
+
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Nauji', 'Vykdomi', 'Užbaigti'],
+                datasets: [{
+                    data: [
+                        {{ $newCount ?? 0 }},
+                        {{ $inProgressCount ?? 0 }},
+                        {{ $completedCount ?? 0 }}
+                    ],
+                    backgroundColor: [
+                        '#007bff',
+                        '#ffc107',
+                        '#28a745'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    </script>
 @stop
