@@ -1,9 +1,9 @@
 @extends('adminlte::page')
 
-@section('title', 'Bilietai')
+@section('title', $pageTitle ?? 'Bilietai')
 
 @section('content_header')
-    <h1>Problemų bilietai</h1>
+    <h1>{{ $pageTitle ?? 'Bilietai' }}</h1>
 @stop
 
 @section('content')

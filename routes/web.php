@@ -22,6 +22,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         return redirect()->route('tickets.index');
     })->name('dashboard');
+    Route::get('/tickets/status/naujas', [TicketController::class, 'newTickets'])
+    ->name('tickets.new');
+
+    Route::get('/tickets/status/vykdomas', [TicketController::class, 'inProgressTickets'])
+    ->name('tickets.inProgress');
+
+    Route::get('/tickets/status/uzbaigtas', [TicketController::class, 'completedTickets'])
+    ->name('tickets.completed');
 
     Route::resource('tickets', TicketController::class);
 
