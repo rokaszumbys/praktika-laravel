@@ -8,27 +8,56 @@
 
 @section('content')
 
-    {{-- Pranešimas po veiksmų --}}
     @if(session('success'))
         <div class="alert alert-success">
             {{ session('success') }}
         </div>
     @endif
 
-    {{-- Pie chart kortelė --}}
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Bilietų būsenų diagrama</h3>
-        </div>
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Diagramos</h3>
 
-        <div class="card-body">
-            <div style="max-width: 400px; margin: auto;">
-                <canvas id="ticketsPieChart"></canvas>
-            </div>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
         </div>
     </div>
 
-    {{-- Bilietų sąrašas --}}
+    <div class="card-body">
+        <div class="row">
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Bilietų būsenų diagrama</h3>
+                    </div>
+
+                    <div class="card-body">
+                        <div style="max-width: 400px; margin: auto;">
+                            <canvas id="ticketsPieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Bilietų kategorijų diagrama</h3>
+                    </div>
+
+                    <div class="card-body">
+                        <canvas id="ticketsCategoryBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
     <div class="card">
         <div class="card-header">
             <a href="{{ route('tickets.create') }}" class="btn btn-primary">
@@ -99,7 +128,6 @@
             @endif
         </div>
 
-        {{-- PDF ataskaita tik admin/support --}}
         @if(auth()->user()->isAdmin() || auth()->user()->isSupport())
             <div class="card-footer">
                 <a href="{{ route('reports.activeTicketsPdf') }}" class="btn btn-secondary">
@@ -125,9 +153,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-        const ctx = document.getElementById('ticketsPieChart');
+        const pieCtx = document.getElementById('ticketsPieChart');
 
-        new Chart(ctx, {
+        new Chart(pieCtx, {
             type: 'pie',
             data: {
                 labels: ['Nauji', 'Vykdomi', 'Užbaigti'],
@@ -146,6 +174,40 @@
             },
             options: {
                 responsive: true
+            }
+        });
+
+        const barCtx = document.getElementById('ticketsCategoryBarChart');
+
+        new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: @json($categoryLabels ?? []),
+                datasets: [{
+                    label: 'Bilietų skaičius',
+                    data: @json($categoryCounts ?? []),
+                    backgroundColor: [
+                        '#007bff',
+                        '#28a745',
+                        '#ffc107',
+                        '#dc3545',
+                        '#17a2b8',
+                        '#6f42c1',
+                        '#fd7e14',
+                        '#20c997'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
             }
         });
     </script>

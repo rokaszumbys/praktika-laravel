@@ -11,25 +11,90 @@ use App\Mail\TicketStatusChanged;
 
 class TicketController extends Controller
 {
+    private function getTicketStatusChartData()
+    {
+        return [
+            'newCount' => Ticket::where('status', 'Naujas')->count(),
+            'inProgressCount' => Ticket::where('status', 'Vykdomas')->count(),
+            'completedCount' => Ticket::where('status', 'Užbaigtas')->count(),
+        ];
+    }
+
+    private function getTicketCategoryChartData()
+    {
+        $categories = Category::withCount('tickets')->get();
+
+        return [
+            'categoryLabels' => $categories->pluck('name')->toArray(),
+            'categoryCounts' => $categories->pluck('tickets_count')->toArray(),
+        ];
+    }
+
+    private function getAllChartData()
+    {
+        return array_merge(
+            $this->getTicketStatusChartData(),
+            $this->getTicketCategoryChartData()
+        );
+    }
+
     public function index()
     {
         $tickets = Ticket::with(['user', 'category'])
-        ->latest()
-        ->get();
+            ->latest()
+            ->get();
 
-    $pageTitle = 'Visi bilietai';
+        $pageTitle = 'Visi bilietai';
 
-    $newCount = Ticket::where('status', 'Naujas')->count();
-    $inProgressCount = Ticket::where('status', 'Vykdomas')->count();
-    $completedCount = Ticket::where('status', 'Užbaigtas')->count();
+        return view('tickets.index', array_merge(
+            compact('tickets', 'pageTitle'),
+            $this->getAllChartData()
+        ));
+    }
 
-    return view('tickets.index', compact(
-        'tickets',
-        'pageTitle',
-        'newCount',
-        'inProgressCount',
-        'completedCount'
-    ));
+    public function newTickets()
+    {
+        $tickets = Ticket::with(['user', 'category'])
+            ->where('status', 'Naujas')
+            ->latest()
+            ->get();
+
+        $pageTitle = 'Nauji bilietai';
+
+        return view('tickets.index', array_merge(
+            compact('tickets', 'pageTitle'),
+            $this->getAllChartData()
+        ));
+    }
+
+    public function inProgressTickets()
+    {
+        $tickets = Ticket::with(['user', 'category'])
+            ->where('status', 'Vykdomas')
+            ->latest()
+            ->get();
+
+        $pageTitle = 'Vykdomi bilietai';
+
+        return view('tickets.index', array_merge(
+            compact('tickets', 'pageTitle'),
+            $this->getAllChartData()
+        ));
+    }
+
+    public function completedTickets()
+    {
+        $tickets = Ticket::with(['user', 'category'])
+            ->where('status', 'Užbaigtas')
+            ->latest()
+            ->get();
+
+        $pageTitle = 'Užbaigti bilietai';
+
+        return view('tickets.index', array_merge(
+            compact('tickets', 'pageTitle'),
+            $this->getAllChartData()
+        ));
     }
 
     public function create()
@@ -126,53 +191,8 @@ class TicketController extends Controller
         ]);
 
         Mail::to($ticket->user->email)->send(new TicketStatusChanged($ticket));
-        
+
         return redirect()->route('tickets.show', $ticket)
             ->with('success', 'Bilieto būsena pakeista.');
-    }
-    public function newTickets()
-    {
-    $tickets = Ticket::with(['user', 'category'])
-        ->where('status', 'Naujas')
-        ->latest()
-        ->get();
-
-    $pageTitle = 'Nauji bilietai';
-
-    $newCount = Ticket::where('status', 'Naujas')->count();
-    $inProgressCount = Ticket::where('status', 'Vykdomas')->count();
-    $completedCount = Ticket::where('status', 'Užbaigtas')->count();
-
-    return view('tickets.index', compact(
-        'tickets',
-        'pageTitle',
-        'newCount',
-        'inProgressCount',
-        'completedCount'
-    ));
-    }
-
-    public function inProgressTickets()
-    {
-    $tickets = Ticket::with(['user', 'category'])
-        ->where('status', 'Vykdomas')
-        ->latest()
-        ->get();
-
-    $pageTitle = 'Vykdomi bilietai';
-
-    return view('tickets.index', compact('tickets', 'pageTitle'));
-    }
-
-    public function completedTickets()
-    {
-    $tickets = Ticket::with(['user', 'category'])
-        ->where('status', 'Užbaigtas')
-        ->latest()
-        ->get();
-
-    $pageTitle = 'Užbaigti bilietai';
-
-    return view('tickets.index', compact('tickets', 'pageTitle'));
     }
 }
