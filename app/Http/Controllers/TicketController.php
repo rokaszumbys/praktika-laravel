@@ -133,13 +133,17 @@ class TicketController extends Controller
 
     public function edit(Ticket $ticket)
     {
-        if (Auth::id() !== $ticket->user_id && !Auth::user()->isAdmin()) {
-            abort(403);
-        }
+    if (
+        Auth::id() !== $ticket->user_id &&
+        !Auth::user()->isAdmin() &&
+        !Auth::user()->isSupport()
+    ) {
+        abort(403);
+    }
 
-        $categories = Category::all();
+    $categories = Category::all();
 
-        return view('tickets.edit', compact('ticket', 'categories'));
+    return view('tickets.edit', compact('ticket', 'categories'));
     }
 
     public function update(Request $request, Ticket $ticket)

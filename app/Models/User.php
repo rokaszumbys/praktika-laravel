@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -23,6 +24,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -48,18 +50,27 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * 
+     */
     public function tickets()
     {
-    return $this->hasMany(Ticket::class);
+        return $this->hasMany(Ticket::class);
     }
 
-public function isAdmin()
+    /**
+     * 
+     */
+    public function isAdmin()
     {
-    return $this->role === 'admin';
+        return $this->role === 'admin';
     }
 
-public function isSupport()
-        {
-    return $this->role === 'support';
+    /**
+     * 
+     */
+    public function isSupport()
+    {
+        return $this->role === 'support';
     }
 }
