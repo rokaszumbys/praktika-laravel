@@ -14,50 +14,54 @@
         </div>
     @endif
 
-<div class="card">
-    <div class="card-header">
-        <h3 class="card-title">Diagramos</h3>
+    {{-- Diagramos --}}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Diagramos</h3>
 
-        <div class="card-tools">
-            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                <i class="fas fa-minus"></i>
-            </button>
+            <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </div>
         </div>
-    </div>
 
-    <div class="card-body">
-        <div class="row">
+        <div class="card-body">
+            <div class="row">
 
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Bilietų būsenų diagrama</h3>
-                    </div>
+                {{-- Pie chart pagal būsenas --}}
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Bilietų būsenų diagrama</h3>
+                        </div>
 
-                    <div class="card-body">
-                        <div style="max-width: 400px; margin: auto;">
-                            <canvas id="ticketsPieChart"></canvas>
+                        <div class="card-body">
+                            <div style="max-width: 400px; margin: auto;">
+                                <canvas id="ticketsPieChart"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Bilietų kategorijų diagrama</h3>
-                    </div>
+                {{-- Bar chart pagal kategorijas --}}
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Bilietų kategorijų diagrama</h3>
+                        </div>
 
-                    <div class="card-body">
-                        <canvas id="ticketsCategoryBarChart"></canvas>
+                        <div class="card-body">
+                            <canvas id="ticketsCategoryBarChart"></canvas>
+                        </div>
                     </div>
                 </div>
-            </div>
 
+            </div>
         </div>
     </div>
-</div>
 
+    {{-- Bilietų sąrašas --}}
     <div class="card">
         <div class="card-header">
             <a href="{{ route('tickets.create') }}" class="btn btn-primary">
@@ -102,7 +106,7 @@
                                         Peržiūrėti
                                     </a>
 
-                                    @if(auth()->id() === $ticket->user_id || auth()->user()->isAdmin())
+                                    @if(auth()->id() === $ticket->user_id || auth()->user()->isAdmin() || auth()->user()->isSupport())
                                         <a href="{{ route('tickets.edit', $ticket) }}" class="btn btn-warning btn-sm">
                                             Redaguoti
                                         </a>
@@ -111,7 +115,8 @@
                                             @csrf
                                             @method('DELETE')
 
-                                            <button type="submit" class="btn btn-danger btn-sm">
+                                            <button type="submit" class="btn btn-danger btn-sm"
+                                                onclick="return confirm('Ar tikrai norite ištrinti šį bilietą?')">
                                                 Trinti
                                             </button>
                                         </form>
@@ -121,6 +126,11 @@
                         @endforeach
                     </tbody>
                 </table>
+
+                {{-- Puslapiavimas --}}
+                <div class="mt-3">
+                    {{ $tickets->links() }}
+                </div>
             @else
                 <div class="alert alert-info">
                     Bilietų nėra.
@@ -128,6 +138,7 @@
             @endif
         </div>
 
+        {{-- PDF ataskaita tik admin/support --}}
         @if(auth()->user()->isAdmin() || auth()->user()->isSupport())
             <div class="card-footer">
                 <a href="{{ route('reports.activeTicketsPdf') }}" class="btn btn-secondary">
@@ -153,6 +164,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
+        // Pie chart - bilietai pagal būseną
         const pieCtx = document.getElementById('ticketsPieChart');
 
         new Chart(pieCtx, {
@@ -177,6 +189,7 @@
             }
         });
 
+        // Bar chart - bilietai pagal kategorijas
         const barCtx = document.getElementById('ticketsCategoryBarChart');
 
         new Chart(barCtx, {

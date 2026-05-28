@@ -38,11 +38,18 @@ class TicketController extends Controller
         );
     }
 
+    private function canManageTicket(Ticket $ticket)
+    {
+        return Auth::id() === $ticket->user_id ||
+            Auth::user()->isAdmin() ||
+            Auth::user()->isSupport();
+    }
+
     public function index()
     {
         $tickets = Ticket::with(['user', 'category'])
             ->latest()
-            ->get();
+            ->paginate(10);
 
         $pageTitle = 'Visi bilietai';
 
@@ -57,7 +64,7 @@ class TicketController extends Controller
         $tickets = Ticket::with(['user', 'category'])
             ->where('status', 'Naujas')
             ->latest()
-            ->get();
+            ->paginate(10);
 
         $pageTitle = 'Nauji bilietai';
 
@@ -72,7 +79,7 @@ class TicketController extends Controller
         $tickets = Ticket::with(['user', 'category'])
             ->where('status', 'Vykdomas')
             ->latest()
-            ->get();
+            ->paginate(10);
 
         $pageTitle = 'Vykdomi bilietai';
 
@@ -87,7 +94,7 @@ class TicketController extends Controller
         $tickets = Ticket::with(['user', 'category'])
             ->where('status', 'Užbaigtas')
             ->latest()
-            ->get();
+            ->paginate(10);
 
         $pageTitle = 'Užbaigti bilietai';
 
@@ -133,22 +140,18 @@ class TicketController extends Controller
 
     public function edit(Ticket $ticket)
     {
-    if (
-        Auth::id() !== $ticket->user_id &&
-        !Auth::user()->isAdmin() &&
-        !Auth::user()->isSupport()
-    ) {
-        abort(403);
-    }
+        if (!$this->canManageTicket($ticket)) {
+            abort(403);
+        }
 
-    $categories = Category::all();
+        $categories = Category::all();
 
-    return view('tickets.edit', compact('ticket', 'categories'));
+        return view('tickets.edit', compact('ticket', 'categories'));
     }
 
     public function update(Request $request, Ticket $ticket)
     {
-        if (Auth::id() !== $ticket->user_id && !Auth::user()->isAdmin()) {
+        if (!$this->canManageTicket($ticket)) {
             abort(403);
         }
 
@@ -170,7 +173,7 @@ class TicketController extends Controller
 
     public function destroy(Ticket $ticket)
     {
-        if (Auth::id() !== $ticket->user_id && !Auth::user()->isAdmin()) {
+        if (!$this->canManageTicket($ticket)) {
             abort(403);
         }
 
